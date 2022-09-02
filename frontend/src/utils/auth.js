@@ -53,7 +53,7 @@ export async function renew(jwt) {
   const res = await fetch(`${baseURL}/api/renew`, {
     method: "POST",
     headers: {
-      "X-Auth": jwt,
+      "X-Sandstorm-App-X-Auth": jwt,
     },
   });
 

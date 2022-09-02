@@ -83,6 +83,10 @@ func getAuthentication(flags *pflag.FlagSet, defaults ...interface{}) (settings.
 		auther = &auth.ProxyAuth{Header: header}
 	}
 
+	if method == auth.MethodSandstormAuth {
+		auther = &auth.SandstormAuth{}
+	}
+
 	if method == auth.MethodNoAuth {
 		auther = &auth.NoAuth{}
 	}

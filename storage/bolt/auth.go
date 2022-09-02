@@ -20,6 +20,8 @@ func (s authBackend) Get(t settings.AuthMethod) (auth.Auther, error) {
 		auther = &auth.JSONAuth{}
 	case auth.MethodProxyAuth:
 		auther = &auth.ProxyAuth{}
+	case auth.MethodSandstormAuth:
+		auther = &auth.SandstormAuth{}
 	case auth.MethodHookAuth:
 		auther = &auth.HookAuth{}
 	case auth.MethodNoAuth:

@@ -13,7 +13,7 @@ export async function fetchURL(url, opts, auth = true) {
   try {
     res = await fetch(`${baseURL}${url}`, {
       headers: {
-        "X-Auth": store.state.jwt,
+        "X-Sandstorm-App-X-Auth": store.state.jwt,
         ...headers,
       },
       ...rest,
@@ -25,7 +25,7 @@ export async function fetchURL(url, opts, auth = true) {
     throw error;
   }
 
-  if (auth && res.headers.get("X-Renew-Token") === "true") {
+  if (auth && res.headers.get("X-Sandstorm-App-X-Renew-Token") === "true") {
     await renew(store.state.jwt);
   }
 

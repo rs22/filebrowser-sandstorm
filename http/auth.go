@@ -39,7 +39,7 @@ type authToken struct {
 type extractor []string
 
 func (e extractor) ExtractToken(r *http.Request) (string, error) {
-	token, _ := request.HeaderExtractor{"X-Auth"}.ExtractToken(r)
+	token, _ := request.HeaderExtractor{"X-Sandstorm-App-X-Auth"}.ExtractToken(r)
 
 	// Checks if the token isn't empty and if it contains two dots.
 	// The former prevents incompatibility with URLs that previously
@@ -80,7 +80,7 @@ func withUser(fn handleFunc) handleFunc {
 		updated := tk.IssuedAt != nil && tk.IssuedAt.Unix() < d.store.Users.LastUpdate(tk.User.ID)
 
 		if expired || updated {
-			w.Header().Add("X-Renew-Token", "true")
+			w.Header().Add("X-Sandstorm-App-X-Renew-Token", "true")
 		}
 
 		d.user, err = d.store.Users.Get(d.server.Root, tk.User.ID)

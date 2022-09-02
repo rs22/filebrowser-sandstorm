@@ -95,7 +95,7 @@ export async function post(url, content = "", overwrite = false, onupload) {
       `${baseURL}/api/resources${url}?override=${overwrite}`,
       true
     );
-    request.setRequestHeader("X-Auth", store.state.jwt);
+    request.setRequestHeader("X-Sandstorm-App-X-Auth", store.state.jwt);
 
     if (typeof onupload === "function") {
       request.upload.onprogress = onupload;

@@ -150,6 +150,9 @@ func importConf(db *storm.DB, path string, sto *storage.Storage) error {
 	case "proxy":
 		auther = &auth.ProxyAuth{Header: cfg.Auth.Header}
 		s.AuthMethod = auth.MethodProxyAuth
+	case "sandstorm":
+		auther = &auth.SandstormAuth{}
+		s.AuthMethod = auth.MethodSandstormAuth
 	case "hook":
 		auther = &auth.HookAuth{Command: cfg.Auth.Command}
 		s.AuthMethod = auth.MethodHookAuth
