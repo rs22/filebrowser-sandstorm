@@ -1,0 +1,9 @@
+#! /bin/sh
+
+FILEBROWSER="/filebrowser -c /.filebrowser.json"
+
+mkdir -p /var/srv
+$FILEBROWSER config init > /dev/null
+$FILEBROWSER config set --auth.method=sandstorm  > /dev/null
+
+exec $FILEBROWSER

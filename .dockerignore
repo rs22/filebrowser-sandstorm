@@ -1,3 +1,5 @@
 *
 !docker/*
 !filebrowser
+!docker_config.json
+!entrypoint

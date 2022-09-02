@@ -1,4 +1,5 @@
-FROM alpine:latest
+FROM zenhack/sandstorm-http-bridge:276
+
 RUN apk --update add ca-certificates \
                      mailcap \
                      curl
@@ -11,5 +12,6 @@ EXPOSE 80
 
 COPY docker_config.json /.filebrowser.json
 COPY filebrowser /filebrowser
+COPY entrypoint /entrypoint
 
 ENTRYPOINT [ "/filebrowser" ]
