@@ -19,14 +19,18 @@ jobs:
     steps:
       # Checks-out the repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
+      
+      - name: Install Capnp
+        run: sudo apt-get install capnproto
 
       - name: Install Sandstorm Development Instance
         run: |
           wget https://raw.githubusercontent.com/sandstorm-io/sandstorm/master/install.sh
           chmod +x install.sh && sudo ./install.sh -d
           wget https://github.com/zenhack/docker-spk/releases/download/v1.1/docker-spk-binaries.tar.gz
-          tar -xvzf docker-spk-binaries.tar.gz
-          ls -aslh
+          tar -xzf docker-spk-binaries.tar.gz
+          sudo mv docker-spk-binaries/linux/amd64/docker-spk /usr/local/bin/
+          rm -rf docker-spk-binaries docker-spk-binaries.tar.gz
 
       - name: Restore Sandstorm Keyring
         env:
@@ -38,11 +42,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') == false
         run: |
           sed --in-place='' \
-              --expression="s/xrm87uacxhq8t07hy63kxta5k5a9pf1ca3am2wafrvxp9c2c5hhh/$(sudo spk keygen -q)/" \
+              --expression="s/cgxd1w24pux98u2js3t504qyw13h9m94k49kdsdazqmqjxc9wk60/$(sudo spk keygen -q)/" \
               sandstorm-pkgdef.capnp
 
       - name: Create Sandstorm Package
         run: |
+          make build
           docker-spk build
 
       - name: Run smoke test
