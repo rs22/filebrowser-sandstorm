@@ -1,0 +1,100 @@
+name: Sandstorm
+
+# Controls when the action will run.
+on:
+  push:
+    branches: [ master ]
+    tags:
+    - 'v*'
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out the repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
+
+      - name: Install Sandstorm Development Instance
+        run: |
+          wget https://raw.githubusercontent.com/sandstorm-io/sandstorm/master/install.sh
+          chmod +x install.sh && sudo ./install.sh -d
+          wget https://github.com/zenhack/docker-spk/releases/download/v1.1/docker-spk-binaries.tar.gz
+          tar -xvzf docker-spk-binaries.tar.gz
+          ls -aslh
+
+      - name: Restore Sandstorm Keyring
+        env:
+          SPK_KEY: ${{ secrets.SPK_KEY }}
+        run: |
+          echo $SPK_KEY | sudo sh -c "base64 -d > ~/.sandstorm-keyring"
+
+      - name: Create Temporary Package Key
+        if: startsWith(github.ref, 'refs/tags/v') == false
+        run: |
+          sed --in-place='' \
+              --expression="s/xrm87uacxhq8t07hy63kxta5k5a9pf1ca3am2wafrvxp9c2c5hhh/$(sudo spk keygen -q)/" \
+              sandstorm-pkgdef.capnp
+
+      - name: Create Sandstorm Package
+        run: |
+          docker-spk build
+
+      - name: Run smoke test
+        uses: cypress-io/github-action@v2
+        with:
+          start: sudo spk dev
+          browser: chrome
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Monica ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release SPK
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./monica.spk
+          asset_name: monica.spk
+          asset_content_type: application/zip
+
+      - name: Submit to Sandstorm App Market
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          sudo spk verify monica.spk
+          sudo spk publish monica.spk
+
+      # after the test run completes
+      # store videos and any screenshots
+      # NOTE: screenshots will be generated only if E2E test failed
+      # thus we store screenshots only on failures
+      # Alternative: create and commit an empty cypress/screenshots folder
+      # to always have something to upload
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+      # Test run video was always captured, so this action uses "always()" condition
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: cypress-videos
+          path: cypress/videos
