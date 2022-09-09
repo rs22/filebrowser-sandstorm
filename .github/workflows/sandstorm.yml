@@ -22,6 +22,11 @@ jobs:
       
       - name: Install Capnp
         run: sudo apt-get install capnproto
+        
+      - name: Start devcontainer
+        run: |
+          npm install -g @devcontainers/cli
+          devcontainer up
 
       - name: Install Sandstorm Development Instance
         run: |
@@ -47,7 +52,7 @@ jobs:
 
       - name: Create Sandstorm Package
         run: |
-          make build
+          devcontainer exec make build
           docker-spk build
 
       - name: Run smoke test
