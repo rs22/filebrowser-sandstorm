@@ -26,7 +26,7 @@ jobs:
       - name: Start devcontainer
         run: |
           npm install -g @devcontainers/cli
-          devcontainer up
+          devcontainer up --workspace-folder .
 
       - name: Install Sandstorm Development Instance
         run: |
