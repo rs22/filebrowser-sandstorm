@@ -32,6 +32,10 @@ func (a *SandstormAuth) Auth(r *http.Request, usr users.Store, stg *settings.Set
 	var cred sandstormCred
 	cred.Username = r.Header.Get("X-Sandstorm-User-Id")
 
+	if cred.Username == "" {
+		cred.Username = "__sandstorm_anonymous"
+	}
+
 	a.Users = usr
 	a.Settings = stg
 	a.Server = srv
@@ -79,6 +83,9 @@ func (a *SandstormAuth) SaveUser() (*users.User, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Anonymous user
+		return u, nil
 	}
 
 	return u, nil
