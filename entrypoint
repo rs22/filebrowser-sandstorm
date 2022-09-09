@@ -4,6 +4,6 @@ FILEBROWSER="/filebrowser -c /.filebrowser.json"
 
 mkdir -p /var/srv
 $FILEBROWSER config init > /dev/null
-$FILEBROWSER config set --auth.method=sandstorm  > /dev/null
+$FILEBROWSER config set --auth.method=sandstorm --perm.share=false  > /dev/null
 
 exec $FILEBROWSER
