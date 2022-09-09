@@ -52,7 +52,7 @@ jobs:
 
       - name: Create Sandstorm Package
         run: |
-          devcontainer exec make build
+          devcontainer --workspace-folder . exec make build
           docker-spk build
 
       - name: Run smoke test
